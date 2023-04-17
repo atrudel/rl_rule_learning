@@ -3,7 +3,7 @@ from typing import Tuple
 
 import numpy as np
 
-from actions import Action, is_reporting, locate_gaze, identify_color
+from actions import Action, is_reporting, locate_gaze, identify_reported_color
 from state import State, Rule, Where, Color
 
 MAX_STEPS = 6
@@ -14,32 +14,27 @@ UNDECIDED_REWARD = -2
 
 class Environment:
     Na = 6
+    Nobs = 14
 
     def reset(self, rule: Rule = None) -> State:
         self.rule = Rule(random.randint(0, 2)) if rule is None else rule
         self.cues, self.correct_color = self.create_cue_permutation(self.rule)
-        self.state = State(
-            count=0,
-            seen_color=Color.UNKNOWN,
-            where_gaze=Where.CENTER
-        )
+        self.state = State()
+        self.count = 0
         return self.state
 
-    def step(self, action: Action) -> Tuple[State, int, bool]:
-        current_state = self.state
-        seen_color = self.get_seen_color(action)
-        reward = self.calculate_reward(action)
-        new_state = State(
-            count=current_state.count + 1,
-            seen_color=seen_color,
-            where_gaze=locate_gaze(action)
-        )
-        self.state = new_state
-        done = (new_state.count >= MAX_STEPS)
-        return new_state, reward, done
-
-    def get_seen_color(self, action: Action) -> Color:
+    def step(self, action: Action) -> Tuple[np.ndarray, int, bool]:
         gaze_direction: Where = locate_gaze(action)
+        seen_color: Color = self.get_seen_color(gaze_direction)
+        reported_color: Color = identify_reported_color(action)
+
+        reward: int = self.calculate_reward(action)
+        self.state.add_information(gaze_direction, seen_color, reported_color)
+        self.count += 1
+        done = (self.count >= MAX_STEPS)
+        return self.state.to_array(), reward, done
+
+    def get_seen_color(self, gaze_direction: Where) -> Color:
         if gaze_direction == Where.CENTER:
             return Color.UNKNOWN
         else:
@@ -47,12 +42,12 @@ class Environment:
 
     def calculate_reward(self, action: Action) -> int:
         if is_reporting(action):
-            if identify_color(action) == self.correct_color:
+            if identify_reported_color(action) == self.correct_color:
                 return 0
             else:
                 return WRONG_ANSWER_REWARD
         else:
-            if state.count > 2:
+            if self.count > 2:
                 return UNDECIDED_REWARD
             else:
                 return 0

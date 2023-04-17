@@ -28,7 +28,7 @@ def locate_gaze(action: Action) -> Where:
         return Where.CENTER
 
 
-def identify_color(action: Action) -> Color:
+def identify_reported_color(action: Action) -> Color:
     if is_reporting(action):
         return Color(action - 3)
     else:
