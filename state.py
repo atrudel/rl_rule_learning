@@ -44,26 +44,3 @@ class State:
         array[9 + self.position] = 1
         array[13:17] = self.attempts
         return array
-
-
-# Test
-if __name__ == '__main__':
-    state = State()
-    print(state)
-    print(state.to_array())
-
-    state.add_information(Where.UP, Color.RED, reported_color=Color.UNKNOWN)
-    print(state)
-    print(state.to_array())
-
-    state.add_information(Where.CENTER, Color.UNKNOWN, reported_color=Color.RED)
-    print(state)
-    print(state.to_array())
-
-    state.add_information(Where.LEFT, Color.BLUE, reported_color=Color.UNKNOWN)
-    print(state)
-    print(state.to_array())
-
-    state.add_information(Where.UP, Color.RED, reported_color=Color.UNKNOWN)
-    print(state)
-    print(state.to_array())

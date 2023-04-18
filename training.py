@@ -1,20 +1,26 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import torch
 from tqdm import trange
 
 from agent import Agent, device
 from environment import Environment
 
+# Learning rate
 LR = 1e-2
-# EPSILON = 0.9
+# Epsilon decay parameters
 EPS_START = 0.9
 EPS_END = 0.05
 EPS_DECAY = 100
+
+# Discount factor
 GAMMA = 0.99
+
 BATCH_SIZE = 6
 TAU = 0.1
+
+# Nb of hidden neurons of the neural network's layers
 N_HIDDEN = 20
+
 N_EPISODES = 100
 
 

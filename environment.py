@@ -67,19 +67,3 @@ class Environment:
     def __repr__(self) -> str:
         return f"Environment[Rule={self.rule}, Corr_Color={self.correct_color} | Cues={self.cues}]"
 
-
-if __name__ == '__main__':
-    env = Environment()
-    state = env.reset()
-    print(env)
-    print(state)
-    print()
-    done = False
-    while not done:
-        action = int(input("enter action"))
-        state, reward, done = env.step(Action(action))
-        print(env)
-        print(state)
-        print(f"Reward={reward}")
-        print(f"done={done}")
-        print()
