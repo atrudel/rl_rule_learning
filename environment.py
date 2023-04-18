@@ -14,23 +14,24 @@ UNDECIDED_REWARD = -2
 
 class Environment:
     Na = 6
-    Nobs = 14
+    Nobs = 17
 
-    def reset(self, rule: Rule = None) -> State:
+    def reset(self, rule: Rule = None) -> np.ndarray:
         self.rule = Rule(random.randint(0, 2)) if rule is None else rule
         self.cues, self.correct_color = self.create_cue_permutation(self.rule)
         self.state = State()
         self.count = 0
-        return self.state
+        self.success = 0
+        return self.state.to_array()
 
     def step(self, action: Action) -> Tuple[np.ndarray, int, bool]:
         gaze_direction: Where = locate_gaze(action)
         seen_color: Color = self.get_seen_color(gaze_direction)
         reported_color: Color = identify_reported_color(action)
-
         reward: int = self.calculate_reward(action)
         self.state.add_information(gaze_direction, seen_color, reported_color)
         self.count += 1
+        self.register_success(action)
         done = (self.count >= MAX_STEPS)
         return self.state.to_array(), reward, done
 
@@ -57,6 +58,11 @@ class Environment:
         permutation[1] = Color(rule)
         correct_color = permutation[rule]
         return permutation, correct_color
+
+    def register_success(self, action: Action) -> None:
+        if identify_reported_color(action) == self.correct_color:
+            if self.success == 0:
+                self.success = self.count
 
     def __repr__(self) -> str:
         return f"Environment[Rule={self.rule}, Corr_Color={self.correct_color} | Cues={self.cues}]"

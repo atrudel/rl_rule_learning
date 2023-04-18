@@ -46,6 +46,7 @@ class State:
         return array
 
 
+# Test
 if __name__ == '__main__':
     state = State()
     print(state)
